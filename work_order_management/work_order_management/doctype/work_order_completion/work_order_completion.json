@@ -1,0 +1,362 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "autoname": "WOC-.####",
+ "creation": "2026-10-01 23:52:15.248973",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "work_order_slip",
+  "assigned_department",
+  "cb_1",
+  "priority",
+  "reference_no",
+  "cb_2",
+  "slip_date",
+  "slip_time",
+  "sb_slip",
+  "requesting_department",
+  "shift",
+  "cb_3",
+  "machine_name",
+  "asset",
+  "sb_slip_defect",
+  "defect_description",
+  "sb_repair",
+  "details_of_defects",
+  "parts",
+  "sb_status",
+  "complaint_type",
+  "work_status",
+  "completed_by",
+  "cb_4",
+  "completion_date",
+  "completion_time",
+  "downtime_hours",
+  "cb_5",
+  "received_by",
+  "sb_remarks",
+  "remarks",
+  "sb_approval",
+  "approver_remarks",
+  "cb_approval",
+  "approved_by",
+  "approved_on",
+  "workflow_state",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "work_order_slip",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Work Order Slip",
+   "options": "Work Order Slip",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "work_order_slip.assigned_department",
+   "fieldname": "assigned_department",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Assigned Department",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "work_order_slip.priority",
+   "fieldname": "priority",
+   "fieldtype": "Data",
+   "label": "Priority",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "work_order_slip.reference_no",
+   "fieldname": "reference_no",
+   "fieldtype": "Data",
+   "label": "Reference No.",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "work_order_slip.date",
+   "fieldname": "slip_date",
+   "fieldtype": "Date",
+   "label": "Slip Date",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "work_order_slip.time",
+   "fieldname": "slip_time",
+   "fieldtype": "Time",
+   "label": "Slip Time",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_slip",
+   "fieldtype": "Section Break",
+   "label": "Slip Details"
+  },
+  {
+   "fetch_from": "work_order_slip.requesting_department",
+   "fieldname": "requesting_department",
+   "fieldtype": "Link",
+   "label": "Requesting Department",
+   "options": "Department",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "work_order_slip.shift",
+   "fieldname": "shift",
+   "fieldtype": "Link",
+   "label": "Shift",
+   "options": "Shift Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "work_order_slip.machine_name",
+   "fieldname": "machine_name",
+   "fieldtype": "Data",
+   "label": "Machine Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "work_order_slip.asset",
+   "fieldname": "asset",
+   "fieldtype": "Data",
+   "label": "Asset",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_slip_defect",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "work_order_slip.defect_description",
+   "fieldname": "defect_description",
+   "fieldtype": "Small Text",
+   "label": "Defect Description",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_repair",
+   "fieldtype": "Section Break",
+   "label": "Details of Defects, Repair and Parts"
+  },
+  {
+   "fieldname": "details_of_defects",
+   "fieldtype": "Text",
+   "label": "Details of Defects Found & Repair Done",
+   "reqd": 1
+  },
+  {
+   "fieldname": "parts",
+   "fieldtype": "Table",
+   "label": "Repaired / Replaced Parts",
+   "options": "Work Order Completion Part"
+  },
+  {
+   "fieldname": "sb_status",
+   "fieldtype": "Section Break",
+   "label": "Status and Completion"
+  },
+  {
+   "fieldname": "complaint_type",
+   "fieldtype": "Select",
+   "label": "Complaint Type",
+   "options": "\nNew\nRepeated",
+   "read_only_depends_on": "eval:doc.workflow_state != 'Pending Approval'"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "work_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Work Status",
+   "options": "Pending\nCompleted",
+   "read_only_depends_on": "eval:doc.workflow_state != 'Pending Approval'",
+   "reqd": 1
+  },
+  {
+   "fieldname": "completed_by",
+   "fieldtype": "Link",
+   "label": "Completed By / Incharge",
+   "mandatory_depends_on": "eval:doc.work_status=='Completed'",
+   "options": "User"
+  },
+  {
+   "fieldname": "cb_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "completion_date",
+   "fieldtype": "Date",
+   "label": "Completion Date",
+   "mandatory_depends_on": "eval:doc.work_status=='Completed'"
+  },
+  {
+   "fieldname": "completion_time",
+   "fieldtype": "Time",
+   "label": "Completion Time",
+   "mandatory_depends_on": "eval:doc.work_status=='Completed'"
+  },
+  {
+   "description": "From slip date/time to completion date/time",
+   "fieldname": "downtime_hours",
+   "fieldtype": "Float",
+   "label": "Downtime (Hours)",
+   "precision": "1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cb_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Person who accepted the machine back",
+   "fieldname": "received_by",
+   "fieldtype": "Link",
+   "label": "Received By (Requesting Dept)",
+   "options": "User"
+  },
+  {
+   "fieldname": "sb_remarks",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Work Order Completion",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "sb_approval",
+   "fieldtype": "Section Break",
+   "label": "Approval"
+  },
+  {
+   "description": "Required when sending back for rework",
+   "fieldname": "approver_remarks",
+   "fieldtype": "Small Text",
+   "label": "Approver Remarks",
+   "read_only_depends_on": "eval:doc.workflow_state != 'Pending Approval'"
+  },
+  {
+   "fieldname": "cb_approval",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "approved_by",
+   "fieldtype": "Link",
+   "label": "Approved By",
+   "no_copy": 1,
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "approved_on",
+   "fieldtype": "Datetime",
+   "label": "Approved On",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "workflow_state",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Workflow State",
+   "no_copy": 1,
+   "options": "Workflow State",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-10-02 11:19:16.570309",
+ "modified_by": "Administrator",
+ "module": "Work Order Management",
+ "name": "Work Order Completion",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Work Order User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Work Order Approver",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "work_order_slip",
+ "track_changes": 1
+}

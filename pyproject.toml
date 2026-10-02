@@ -4,7 +4,7 @@ authors = [
     { name = "ATS", email = "admin@ats.local"}
 ]
 description = "Work order slip and completion"
-requires-python = ">=3.14"
+requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [

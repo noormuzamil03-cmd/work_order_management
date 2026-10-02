@@ -304,3 +304,8 @@ require_type_annotated_api_methods = True
 # List of apps whose translatable strings should be excluded from this app's translations.
 # ignore_translatable_strings_from = []
 
+
+
+# Create roles, workflow states, actions and the approval workflow automatically
+after_install = "work_order_management.setup_workflow.ensure_workflow"
+after_migrate = "work_order_management.setup_workflow.ensure_workflow"
