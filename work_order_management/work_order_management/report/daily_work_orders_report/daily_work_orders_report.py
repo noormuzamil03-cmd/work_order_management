@@ -2,6 +2,8 @@ import frappe
 from frappe import _
 from frappe.utils import get_datetime, now_datetime
 
+from work_order_management.permissions import slip_condition_for
+
 
 def execute(filters=None):
     filters = frappe._dict(filters or {})
@@ -37,6 +39,11 @@ def get_columns():
 def get_data(filters):
     conditions = ["s.docstatus = 1"]
     params = {}
+
+    # Only work orders this user is allowed to see
+    perm = slip_condition_for(frappe.session.user, "s")
+    if perm:
+        conditions.append(perm)
 
     if filters.from_date:
         conditions.append("s.date >= %(from_date)s")

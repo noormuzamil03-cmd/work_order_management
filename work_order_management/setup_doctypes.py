@@ -38,8 +38,8 @@ SLIP_FIELDS = [
      "default": "Normal", "reqd": 1, "in_list_view": 1, "in_standard_filter": 1},
     {"fieldname": "reference_no", "fieldtype": "Data", "label": "Reference No."},
     {"fieldname": "cb_1", "fieldtype": "Column Break"},
-    {"fieldname": "date", "fieldtype": "Date", "label": "Date", "default": "Today", "reqd": 1, "in_list_view": 1},
-    {"fieldname": "time", "fieldtype": "Time", "label": "Time"},
+    {"fieldname": "date", "fieldtype": "Date", "label": "Date", "default": "Today", "reqd": 1, "read_only": 1, "in_list_view": 1},
+    {"fieldname": "time", "fieldtype": "Time", "label": "Time", "read_only": 1},
 
     {"fieldname": "sb_dept", "fieldtype": "Section Break", "label": "Department / Machine"},
     {"fieldname": "requesting_department", "fieldtype": "Link", "label": "Requesting Department",

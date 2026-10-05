@@ -309,3 +309,15 @@ require_type_annotated_api_methods = True
 # Create roles, workflow states, actions and the approval workflow automatically
 after_install = "work_order_management.setup_workflow.ensure_workflow"
 after_migrate = "work_order_management.setup_workflow.ensure_workflow"
+
+
+# Row-level visibility: users only see work orders they are involved in
+permission_query_conditions = {
+    "Work Order Slip": "work_order_management.permissions.slip_query",
+    "Work Order Completion": "work_order_management.permissions.completion_query",
+}
+
+has_permission = {
+    "Work Order Slip": "work_order_management.permissions.slip_has_permission",
+    "Work Order Completion": "work_order_management.permissions.completion_has_permission",
+}

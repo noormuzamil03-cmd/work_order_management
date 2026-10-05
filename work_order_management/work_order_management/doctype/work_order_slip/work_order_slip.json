@@ -57,12 +57,14 @@
    "fieldtype": "Date",
    "in_list_view": 1,
    "label": "Date",
+   "read_only": 1,
    "reqd": 1
   },
   {
    "fieldname": "time",
    "fieldtype": "Time",
-   "label": "Time"
+   "label": "Time",
+   "read_only": 1
   },
   {
    "fieldname": "sb_dept",
@@ -182,7 +184,7 @@
    "link_fieldname": "work_order_slip"
   }
  ],
- "modified": "2026-10-02 11:19:16.323365",
+ "modified": "2026-10-03 13:15:39.180461",
  "modified_by": "Administrator",
  "module": "Work Order Management",
  "name": "Work Order Slip",

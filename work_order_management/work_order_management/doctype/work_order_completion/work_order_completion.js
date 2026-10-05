@@ -53,3 +53,108 @@ frappe.ui.form.on("Work Order Completion", {
 		frm.set_value("downtime_hours", hours >= 0 ? Math.round(hours * 10) / 10 : 0);
 	},
 });
+
+/* ---------- Urdu / English typing and right-to-left display ---------- */
+(function () {
+	const MAP = {
+		a: "ا", b: "ب", c: "چ", d: "د", e: "ع", f: "ف", g: "گ", h: "ھ", i: "ی", j: "ج",
+		k: "ک", l: "ل", m: "م", n: "ن", o: "ہ", p: "پ", q: "ق", r: "ر", s: "س", t: "ت",
+		u: "ء", v: "ط", w: "و", x: "ش", y: "ے", z: "ز",
+		A: "آ", B: "ب", C: "ث", D: "ڈ", E: "ع", F: "ف", G: "غ", H: "ح", I: "ی", J: "ض",
+		K: "خ", L: "ل", M: "م", N: "ں", O: "ۃ", P: "پ", Q: "ق", R: "ڑ", S: "ص", T: "ٹ",
+		U: "ئ", V: "ظ", W: "و", X: "ژ", Y: "ۓ", Z: "ذ",
+		",": "،", "?": "؟", ";": "؛", ".": "۔",
+	};
+	const KEY = "wom_urdu_typing";
+	const TYPE_FIELDS = ["details_of_defects", "remarks", "approver_remarks"];
+	const VIEW_FIELDS = ["defect_description", "details_of_defects", "remarks", "approver_remarks"];
+	const is_on = () => localStorage.getItem(KEY) !== "0";
+
+	function add_style() {
+		if (document.getElementById("wom-woc-urdu-style-v3")) return;
+		const selectors = VIEW_FIELDS.map((f) =>
+			`[data-fieldname="${f}"] textarea, [data-fieldname="${f}"] .control-value, [data-fieldname="${f}"] .like-disabled-input`
+		).join(", ");
+		const style = document.createElement("style");
+		style.id = "wom-woc-urdu-style-v3";
+		style.textContent = `
+			${selectors} {
+				unicode-bidi: plaintext;
+				text-align: start;
+				font-family: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Urdu Typesetting", "Noto Naskh Arabic", sans-serif;
+				font-size: 16px;
+				line-height: 2;
+			}
+			.wom-lang-switch {
+				display: inline-flex; margin-left: 8px; vertical-align: middle; user-select: none;
+				border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden;
+			}
+			.wom-lang-switch [data-lang] { font-size: 11px; padding: 1px 10px; cursor: pointer; }
+			.wom-lang-switch [data-lang].active { background: var(--primary); color: #fff; }
+		`;
+		document.head.appendChild(style);
+	}
+
+	function update_switches() {
+		const on = is_on();
+		$(".wom-lang-switch").each(function () {
+			$(this).find('[data-lang="ur"]').toggleClass("active", on);
+			$(this).find('[data-lang="en"]').toggleClass("active", !on);
+		});
+	}
+
+	function setup_field(frm, fieldname) {
+		const field = frm.fields_dict[fieldname];
+		if (!field) return;
+
+		if (frm.doc.docstatus !== 0) {
+			field.$wrapper.find(".wom-lang-switch").remove();
+			return;
+		}
+		if (!field.$input) return;
+		const $input = field.$input;
+
+		if (!field.$wrapper.find(".wom-lang-switch").length) {
+			const $switch = $(
+				'<span class="wom-lang-switch">' +
+					'<span data-lang="ur" title="' + __("Type in Urdu") + '">اردو</span>' +
+					'<span data-lang="en" title="' + __("Type in English") + '">English</span>' +
+				"</span>"
+			).appendTo(field.$wrapper.find(".control-label").first());
+
+			$switch.on("click", "[data-lang]", function (e) {
+				e.preventDefault();
+				e.stopPropagation();
+				localStorage.setItem(KEY, $(this).attr("data-lang") === "ur" ? "1" : "0");
+				update_switches();
+				$input.trigger("focus");
+			});
+		}
+		update_switches();
+
+		if ($input.data("wom-urdu")) return;
+		$input.data("wom-urdu", true);
+
+		$input.on("keydown", (e) => {
+			if (!is_on() || e.ctrlKey || e.metaKey || e.altKey) return;
+			const ch = MAP[e.key];
+			if (!ch) return;
+			e.preventDefault();
+			if (!document.execCommand("insertText", false, ch)) {
+				const el = $input[0];
+				const start = el.selectionStart;
+				const end = el.selectionEnd;
+				el.value = el.value.slice(0, start) + ch + el.value.slice(end);
+				el.selectionStart = el.selectionEnd = start + ch.length;
+				$input.trigger("input");
+			}
+		});
+	}
+
+	frappe.ui.form.on("Work Order Completion", {
+		refresh(frm) {
+			add_style();
+			TYPE_FIELDS.forEach((f) => setup_field(frm, f));
+		},
+	});
+})();

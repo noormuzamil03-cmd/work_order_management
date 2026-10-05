@@ -20,6 +20,26 @@ frappe.query_reports["Daily Work Orders Report"] = {
 		},
 	],
 
+	onload: function (report) {
+		const open_print = (as_pdf) => {
+			frappe.ui.get_print_settings(
+				as_pdf,
+				(print_settings) => {
+					if (as_pdf) {
+						report.pdf_report(print_settings);
+					} else {
+						report.print_report(print_settings);
+					}
+				},
+				report.report_doc && report.report_doc.letter_head,
+				report.get_visible_columns()
+			);
+		};
+
+		report.page.add_inner_button(__("Print"), () => open_print(false));
+		report.page.add_inner_button(__("PDF"), () => open_print(true));
+	},
+
 	formatter: function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 		if (column.fieldname === "status" && data && data.status) {
