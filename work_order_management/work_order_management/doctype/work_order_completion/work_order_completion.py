@@ -66,6 +66,19 @@ class WorkOrderCompletion(Document):
         if other:
             frappe.throw(_("A Work Order Completion ({0}) already exists for this slip.").format(other))
 
+        # Completion date/time = the moment the work is sent for approval
+        before = self.get_doc_before_save()
+        if self.workflow_state == "Pending Approval" and (not before or before.workflow_state != "Pending Approval"):
+            current = now_datetime()
+            self.completion_date = current.strftime("%Y-%m-%d")
+            self.completion_time = current.strftime("%H:%M:%S")
+
+        # Never leave completion date/time empty
+        if not self.completion_date or not self.completion_time:
+            current = now_datetime()
+            self.completion_date = self.completion_date or current.strftime("%Y-%m-%d")
+            self.completion_time = self.completion_time or current.strftime("%H:%M:%S")
+
         if self.workflow_state == "Pending Approval":
             self.validate_ready_for_approval()
             self.suggest_complaint_type()
@@ -82,8 +95,6 @@ class WorkOrderCompletion(Document):
     def validate_ready_for_approval(self):
         required = (
             ("details_of_defects", _("Details of Defects Found & Repair Done")),
-            ("completion_date", _("Completion Date")),
-            ("completion_time", _("Completion Time")),
             ("completed_by", _("Completed By / Incharge")),
         )
         missing = [label for field, label in required if not self.get(field)]

@@ -15,6 +15,13 @@ frappe.ui.form.on("Work Order Completion", {
 		frm.set_query("received_by", users);
 	},
 
+	onload(frm) {
+		if (frm.is_new() && !frm.doc.completion_date) {
+			frm.set_value("completion_date", frappe.datetime.get_today());
+			frm.set_value("completion_time", frappe.datetime.now_time());
+		}
+	},
+
 	refresh(frm) {
 		if (frm.doc.work_order_slip) {
 			frm.add_custom_button(__("Back to Slip"), () => {
