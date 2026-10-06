@@ -1,0 +1,160 @@
+<style>
+	@page { size: A4 landscape; margin: 8mm; }
+	.le { font-family: Arial, Helvetica, sans-serif; font-size: 9.5px; color: #111; }
+	.le, .le * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+	.le table { width: 100%; border-collapse: collapse; }
+	.le .hdr td { border: 1.5px solid #1a237e; vertical-align: middle; }
+	.le .band { background: #1e3fd8; color: #fff; font-size: 22px; text-align: center; padding: 8px; letter-spacing: 1px; }
+	.le .ttl { font-size: 17px; font-weight: bold; text-align: center; padding: 7px; }
+	.le .rec { width: 18%; text-align: center; font-size: 9px; }
+	.le .rec b { display: block; font-size: 11px; margin-top: 2px; }
+	.le .ly { width: 14%; font-weight: bold; font-size: 12px; text-align: center; padding: 4px; }
+	.le .lyv { font-weight: bold; font-size: 12px; padding: 4px 8px; }
+	.le .info td { padding: 4px; font-size: 9px; border-bottom: 1px solid #1a237e; }
+	.le .grid { margin-top: 4px; }
+	.le .grid th { border-bottom: 1.5px solid #111; text-align: left; padding: 5px 4px; font-size: 9px; white-space: nowrap; }
+	.le .grid td { padding: 6px 4px; border-bottom: 1px dashed #777; vertical-align: top; }
+	.le .num { text-align: right; white-space: nowrap; }
+	.le .nw { white-space: nowrap; }
+	.le .sub { display: block; color: #444; margin-top: 3px; font-size: 8.5px; }
+	.le .sig { border: 1px solid #555; height: 28px; min-width: 70px; }
+	.le .tot td { font-weight: bold; border-top: 1.5px solid #111; border-bottom: 1.5px solid #111; }
+	.le .signs { margin-top: 50px; page-break-inside: avoid; }
+	.le .signs td { text-align: center; width: 25%; padding: 0 10px; }
+	.le .signs span { display: inline-block; border-top: 1px solid #111; padding-top: 3px; width: 80%; }
+	.le .empty { text-align: center; padding: 20px; color: #777; }
+</style>
+
+{%
+	var company = frappe.defaults.get_default("company") || "Company Name";
+	var summary = filters.summary && filters.summary !== "None";
+	var rows = data.filter(function (r) { return !r.is_total; });
+	var total = data.filter(function (r) { return r.is_total; })[0] || {};
+	var n0 = function (v) { return format_number(v || 0, null, 0); };
+	var n2 = function (v) { return format_number(v || 0, null, 2); };
+	var d = function (v) { return v ? frappe.datetime.str_to_user(v) : ""; };
+	var esc = function (t) { return t ? frappe.utils.escape_html(String(t)) : ""; };
+	var leave_year = filters.from_date ? String(filters.from_date).slice(0, 4) : "";
+	var printed_by = frappe.session.user_fullname || frappe.session.user;
+	var now = frappe.datetime.str_to_user(frappe.datetime.now_datetime());
+	var bank = !!filters.bank_sheet;
+	var cadre = !!filters.show_cadre;
+%}
+
+<div class="le">
+	<table class="hdr">
+		<tr><td colspan="3" class="band">{%= esc(company) %}</td></tr>
+		<tr>
+			<td colspan="2" class="ttl">Employee Leave Encashment Report{%= summary ? " (Summary by " + esc(filters.summary) + ")" : "" %}</td>
+			<td class="rec">Record No<b>CN/QR/HRM/S-025</b></td>
+		</tr>
+		<tr>
+			<td class="ly">Leave Year</td>
+			<td colspan="2" class="lyv">{%= leave_year %}</td>
+		</tr>
+	</table>
+
+	<table class="info">
+		<tr>
+			<td>{%= now %}</td>
+			<td>Printed By: <b>{%= esc(printed_by) %}</b></td>
+			<td>Period: <b>{%= d(filters.from_date) %}</b> to <b>{%= d(filters.to_date) %}</b></td>
+			<td style="text-align:right;">Pay Mode: <b>{%= esc(filters.pay_mode || "All") %}</b></td>
+		</tr>
+	</table>
+
+	{% if (!summary) { %}
+	<table class="grid">
+		<thead>
+			<tr>
+				<th>Sr.No</th><th>Name</th><th>Code</th><th>Designation</th><th>DOA</th>
+				<th class="num">G.Salary</th><th class="num">L.Days</th><th class="num">Rate</th>
+				<th class="num">Amount</th><th class="num">Advance</th><th class="num">Inc.Tax</th><th class="num">Paid Leave</th>
+				{% if (cadre) { %}<th>Cadre</th>{% } %}
+				{% if (bank) { %}<th>Bank / Account</th>{% } %}
+				<th>Signature</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% if (!rows.length) { %}
+			<tr><td colspan="16" class="empty">No leave encashments found for the selected filters.</td></tr>
+			{% } %}
+			{% for (var i = 0; i < rows.length; i++) { var r = rows[i]; %}
+			<tr>
+				<td>{%= r.sr_no %}</td>
+				<td><b>{%= esc(r.employee_name) %}</b>{% if (r.cnic) { %}<span class="sub">{%= esc(r.cnic) %}</span>{% } %}</td>
+				<td>{%= esc(r.code) %}</td>
+				<td>{%= esc(r.designation) %}</td>
+				<td class="nw">{%= d(r.doa) %}</td>
+				<td class="num">{%= n0(r.gross_salary) %}</td>
+				<td class="num">{%= n2(r.leave_days) %}</td>
+				<td class="num">{%= n2(r.rate) %}</td>
+				<td class="num">{%= n0(r.amount) %}</td>
+				<td class="num">{%= r.advance ? n0(r.advance) : "" %}</td>
+				<td class="num">{%= n0(r.income_tax) %}</td>
+				<td class="num"><b>{%= n0(r.paid_leave) %}</b></td>
+				{% if (cadre) { %}<td>{%= esc(r.cadre) %}</td>{% } %}
+				{% if (bank) { %}<td>{%= esc(r.bank_name) %}<span class="sub">{%= esc(r.bank_ac_no) %}</span></td>{% } %}
+				<td><div class="sig"></div></td>
+			</tr>
+			{% } %}
+			{% if (rows.length) { %}
+			<tr class="tot">
+				<td colspan="6">Total ({%= rows.length %} employees)</td>
+				<td class="num">{%= n2(total.leave_days) %}</td>
+				<td></td>
+				<td class="num">{%= n0(total.amount) %}</td>
+				<td class="num">{%= n0(total.advance) %}</td>
+				<td class="num">{%= n0(total.income_tax) %}</td>
+				<td class="num">{%= n0(total.paid_leave) %}</td>
+				{% if (cadre) { %}<td></td>{% } %}
+				{% if (bank) { %}<td></td>{% } %}
+				<td></td>
+			</tr>
+			{% } %}
+		</tbody>
+	</table>
+	{% } else { %}
+	<table class="grid">
+		<thead>
+			<tr>
+				<th>{%= esc(filters.summary) %}</th><th class="num">Employees</th><th class="num">L.Days</th>
+				<th class="num">Amount</th><th class="num">Advance</th><th class="num">Inc.Tax</th><th class="num">Paid Leave</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for (var j = 0; j < rows.length; j++) { var g = rows[j]; %}
+			<tr>
+				<td><b>{%= esc(g.group) %}</b></td>
+				<td class="num">{%= g.employees %}</td>
+				<td class="num">{%= n2(g.leave_days) %}</td>
+				<td class="num">{%= n0(g.amount) %}</td>
+				<td class="num">{%= n0(g.advance) %}</td>
+				<td class="num">{%= n0(g.income_tax) %}</td>
+				<td class="num"><b>{%= n0(g.paid_leave) %}</b></td>
+			</tr>
+			{% } %}
+			{% if (rows.length) { %}
+			<tr class="tot">
+				<td>Total</td>
+				<td class="num">{%= total.employees %}</td>
+				<td class="num">{%= n2(total.leave_days) %}</td>
+				<td class="num">{%= n0(total.amount) %}</td>
+				<td class="num">{%= n0(total.advance) %}</td>
+				<td class="num">{%= n0(total.income_tax) %}</td>
+				<td class="num">{%= n0(total.paid_leave) %}</td>
+			</tr>
+			{% } %}
+		</tbody>
+	</table>
+	{% } %}
+
+	<table class="signs">
+		<tr>
+			<td><span>Prepared By</span></td>
+			<td><span>HR Manager</span></td>
+			<td><span>Accounts</span></td>
+			<td><span>Approved By</span></td>
+		</tr>
+	</table>
+</div>
