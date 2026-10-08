@@ -13,6 +13,12 @@ frappe.ui.form.on("Work Order Completion", {
 		const users = () => ({ filters: { enabled: 1, user_type: "System User" } });
 		frm.set_query("completed_by", users);
 		frm.set_query("received_by", users);
+		frm.set_query("completed_by_employees", () => ({
+			filters: frm.doc.assigned_department
+				? { status: "Active", department: ["descendants of (inclusive)", frm.doc.assigned_department] }
+				: { status: "Active" },
+		}));
+		frm.set_query("received_by_employee", () => ({ filters: { status: "Active" } }));
 	},
 
 	onload(frm) {

@@ -107,7 +107,7 @@
 				<td>{%= esc(r.receiving_department) %}</td>
 				<td>{%= esc(r.fault_description) %}</td>
 				<td>{%= esc(r.remarks) %}</td>
-				<td>{%= esc(who(r.completed_by)) %}</td>
+				<td>{%= r.completed_by_names ? esc(r.completed_by_names) : esc(who(r.completed_by)) %}</td>
 				<td class="nowrap {%= is_open ? "open" : "done" %}">{%= esc(r.status) %}</td>
 				<td class="nowrap">{%= esc(r.complaint_type) %}</td>
 			</tr>

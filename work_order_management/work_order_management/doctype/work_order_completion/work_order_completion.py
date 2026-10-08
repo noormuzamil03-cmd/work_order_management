@@ -20,6 +20,7 @@ class WorkOrderCompletion(Document):
 
     if TYPE_CHECKING:
         from frappe.types import DF
+        from work_order_management.work_order_management.doctype.work_order_completion_employee.work_order_completion_employee import WorkOrderCompletionEmployee
         from work_order_management.work_order_management.doctype.work_order_completion_part.work_order_completion_part import WorkOrderCompletionPart
 
         amended_from: DF.Link | None
@@ -30,6 +31,7 @@ class WorkOrderCompletion(Document):
         assigned_department: DF.Link | None
         complaint_type: DF.Literal["", "New", "Repeated"]
         completed_by: DF.Link | None
+        completed_by_employees: DF.TableMultiSelect[WorkOrderCompletionEmployee]
         completion_date: DF.Date | None
         completion_time: DF.Time | None
         defect_description: DF.SmallText | None
@@ -39,6 +41,9 @@ class WorkOrderCompletion(Document):
         parts: DF.Table[WorkOrderCompletionPart]
         priority: DF.Data | None
         received_by: DF.Link | None
+        received_by_card: DF.Data | None
+        received_by_employee: DF.Link | None
+        received_by_name: DF.Data | None
         reference_no: DF.Data | None
         remarks: DF.SmallText | None
         requesting_department: DF.Link | None
@@ -91,11 +96,12 @@ class WorkOrderCompletion(Document):
             self.completion_time = self.completion_time or nowtime()
 
         self.downtime_hours = self.get_downtime(slip)
+        self.validate_team()
 
     def validate_ready_for_approval(self):
         required = (
             ("details_of_defects", _("Details of Defects Found & Repair Done")),
-            ("completed_by", _("Completed By / Incharge")),
+            ("completed_by_employees", _("Completed By / Incharge")),
         )
         missing = [label for field, label in required if not self.get(field)]
         if missing:
@@ -113,6 +119,21 @@ class WorkOrderCompletion(Document):
             "name": ["!=", self.name],
         })
         self.complaint_type = "Repeated" if repeated else "New"
+
+    def validate_team(self):
+        """Completed By employees must belong to the assigned department or its sub-departments."""
+        if not self.assigned_department or not self.get("completed_by_employees"):
+            return
+        node = frappe.db.get_value("Department", self.assigned_department, ["lft", "rgt"], as_dict=True)
+        if not node:
+            return
+        allowed = set(frappe.get_all(
+            "Department", filters={"lft": [">=", node.lft], "rgt": ["<=", node.rgt]}, pluck="name"
+        ))
+        for row in self.completed_by_employees:
+            if frappe.db.get_value("Employee", row.employee, "department") not in allowed:
+                frappe.throw(_("{0} is not in the assigned department {1}.").format(
+                    row.employee_name or row.employee, self.assigned_department))
 
     def before_submit(self):
         if self.work_status != "Completed":

@@ -31,12 +31,16 @@
   "complaint_type",
   "work_status",
   "completed_by",
+  "completed_by_employees",
   "cb_4",
   "completion_date",
   "completion_time",
   "downtime_hours",
   "cb_5",
   "received_by",
+  "received_by_employee",
+  "received_by_name",
+  "received_by_card",
   "sb_remarks",
   "remarks",
   "sb_approval",
@@ -196,9 +200,10 @@
   {
    "fieldname": "completed_by",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Completed By / Incharge",
-   "mandatory_depends_on": "eval:doc.work_status=='Completed'",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
    "fieldname": "cb_4",
@@ -232,8 +237,10 @@
    "description": "Person who accepted the machine back",
    "fieldname": "received_by",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Received By (Requesting Dept)",
-   "options": "User"
+   "options": "User",
+   "read_only": 1
   },
   {
    "fieldname": "sb_remarks",
@@ -295,13 +302,40 @@
    "no_copy": 1,
    "options": "Workflow State",
    "read_only": 1
+  },
+  {
+   "fieldname": "completed_by_employees",
+   "fieldtype": "Table MultiSelect",
+   "label": "Completed By / Incharge",
+   "options": "Work Order Completion Employee"
+  },
+  {
+   "description": "Person who accepted the machine back",
+   "fieldname": "received_by_employee",
+   "fieldtype": "Link",
+   "label": "Received By (Requesting Dept)",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "received_by_employee.employee_name",
+   "fieldname": "received_by_name",
+   "fieldtype": "Data",
+   "label": "Received By Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "received_by_employee.attendance_device_id",
+   "fieldname": "received_by_card",
+   "fieldtype": "Data",
+   "label": "Received By Card No",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-10-06 16:24:29.496943",
+ "modified": "2026-10-08 11:48:58.203016",
  "modified_by": "Administrator",
  "module": "Work Order Management",
  "name": "Work Order Completion",

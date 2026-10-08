@@ -115,6 +115,16 @@ frappe.ui.form.on("Work Order Slip", {
 		if (frm.is_new() && !frm.doc.time) {
 			frm.set_value("time", frappe.datetime.now_time());
 		}
+		if (frm.is_new() && !frm.doc.requested_by_employee) {
+			frm.set_value("requested_by", frappe.session.user);
+			frappe.db.get_value("Employee", { user_id: frappe.session.user, status: "Active" }, "name").then((r) => {
+				if (r.message && r.message.name) {
+					frm.set_value("requested_by_employee", r.message.name);
+				} else {
+					frm.set_value("requested_by_name", frappe.session.user_fullname || frappe.session.user);
+				}
+			});
+		}
 	},
 
 	refresh(frm) {

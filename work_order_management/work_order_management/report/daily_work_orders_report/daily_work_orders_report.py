@@ -29,8 +29,7 @@ def get_columns():
          "options": "Department", "width": 160},
         {"label": _("Fault Description"), "fieldname": "fault_description", "fieldtype": "Data", "width": 280},
         {"label": _("Remarks"), "fieldname": "remarks", "fieldtype": "Data", "width": 220},
-        {"label": _("Completed By"), "fieldname": "completed_by", "fieldtype": "Link",
-         "options": "User", "width": 180},
+        {"label": _("Completed By"), "fieldname": "completed_by_names", "fieldtype": "Data", "width": 180},
         {"label": _("Status"), "fieldname": "status", "fieldtype": "Data", "width": 140},
         {"label": _("Type"), "fieldname": "complaint_type", "fieldtype": "Data", "width": 90},
     ]
@@ -65,7 +64,9 @@ def get_data(filters):
             s.assigned_department AS receiving_department,
             s.defect_description AS fault_description, s.work_status AS status,
             c.completion_date AS ok_date, c.completion_time AS ok_time,
-            c.remarks, c.completed_by, c.complaint_type
+            c.remarks, c.completed_by, c.complaint_type,
+            (SELECT GROUP_CONCAT(ce.employee_name ORDER BY ce.idx SEPARATOR ', ')
+             FROM `tabWork Order Completion Employee` ce WHERE ce.parent = c.name) AS completed_by_names
         FROM `tabWork Order Slip` s
         LEFT JOIN `tabWork Order Completion` c
             ON c.work_order_slip = s.name AND c.docstatus != 2
