@@ -3,30 +3,46 @@
 	.le { font-family: Arial, Helvetica, sans-serif; font-size: 9.5px; color: #111; }
 	.le, .le * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 	.le table { width: 100%; border-collapse: collapse; }
-	.le .hdr td { border: 1.5px solid #1a237e; vertical-align: middle; }
-	.le .band { background: #1e3fd8; color: #fff; font-size: 22px; text-align: center; padding: 8px; letter-spacing: 1px; }
-	.le .ttl { font-size: 17px; font-weight: bold; text-align: center; padding: 7px; }
-	.le .rec { width: 18%; text-align: center; font-size: 9px; }
-	.le .rec b { display: block; font-size: 11px; margin-top: 2px; }
-	.le .ly { width: 14%; font-weight: bold; font-size: 12px; text-align: center; padding: 4px; }
-	.le .lyv { font-weight: bold; font-size: 12px; padding: 4px 8px; }
-	.le .info td { padding: 4px; font-size: 9px; border-bottom: 1px solid #1a237e; }
+
+	/* Header */
+	.le .hdr td { border: 1px solid #222; vertical-align: middle; }
+	.le .logo-cell { width: 15%; padding: 4px !important; text-align: center; }
+	.le .logo { width: 100% !important; height: 99px !important; max-width: none !important; object-fit: contain; display: block; }
+	.le .band { background: #ececec; color: #222; font-size: 20px; font-weight: bold; text-align: center; padding: 11px; letter-spacing: .5px; }
+	.le .ttl { text-align: center; padding: 10px; }
+	.le .ttl span { font-size: 16px; font-weight: bold; text-decoration: underline; }
+	.le .rec-cell { width: 26%; padding: 0 !important; }
+	.le .rec { border-style: hidden; }
+	.le .rec th { background: #ececec; font-size: 9.5px; font-weight: bold; padding: 9px 6px; border: 1px solid #222; text-align: center; }
+	.le .rec td { font-size: 9px; padding: 9px 6px; border: 1px solid #222; text-align: center; }
+	.le .rec .rev { width: 20%; }
+
+	/* Line under the header */
+	.le .meta td { border: 1px solid #222; border-top: none; padding: 7px 8px; font-size: 9px; }
+	.le .meta .m1 { width: 40%; }
+	.le .meta .m2 { width: 32%; background: #f4f4f4; }
+	.le .meta .m3 { text-align: right; }
+	.le .info td { padding: 5px 4px; font-size: 9px; }
+
+	/* Data table */
 	.le .grid { margin-top: 4px; }
-	.le .grid th { border-bottom: 1.5px solid #111; text-align: left; padding: 5px 4px; font-size: 9px; white-space: nowrap; }
+	.le .grid th { border-bottom: 1.5px solid #111; text-align: left; padding: 5px 4px; font-size: 9.5px !important; font-weight: bold !important; color: #111 !important; white-space: nowrap; }
 	.le .grid td { padding: 6px 4px; border-bottom: 1px dashed #777; vertical-align: top; }
 	.le .num { text-align: right; white-space: nowrap; }
 	.le .nw { white-space: nowrap; }
 	.le .sub { display: block; color: #444; margin-top: 3px; font-size: 8.5px; }
-	.le .sig { border: 1px solid #555; height: 28px; min-width: 70px; }
+	.le .sig { border: 1px solid #555; height: 40px; min-width: 110px; }
 	.le .tot td { font-weight: bold; border-top: 1.5px solid #111; border-bottom: 1.5px solid #111; }
 	.le .signs { margin-top: 50px; page-break-inside: avoid; }
 	.le .signs td { text-align: center; width: 25%; padding: 0 10px; }
 	.le .signs span { display: inline-block; border-top: 1px solid #111; padding-top: 3px; width: 80%; }
 	.le .empty { text-align: center; padding: 20px; color: #777; }
+	.le .draft { display: inline-block; margin-left: 5px; color: #c62828; font-weight: bold; font-size: 8px; border: 1px solid #c62828; border-radius: 3px; padding: 0 3px; }
 </style>
 
 {%
-	var company = frappe.defaults.get_default("company") || "Company Name";
+	var logo = "/files/ats.jpeg";
+	var company = "ATS Synthetic (Pvt) Ltd";
 	var summary = filters.summary && filters.summary !== "None";
 	var rows = data.filter(function (r) { return !r.is_total; });
 	var total = data.filter(function (r) { return r.is_total; })[0] || {};
@@ -36,30 +52,35 @@
 	var esc = function (t) { return t ? frappe.utils.escape_html(String(t)) : ""; };
 	var leave_year = filters.from_date ? String(filters.from_date).slice(0, 4) : "";
 	var printed_by = frappe.session.user_fullname || frappe.session.user;
-	var now = frappe.datetime.str_to_user(frappe.datetime.now_datetime());
+	var now_long = moment().format("dddd, DD-MMMM-YYYY hh:mm a");
 	var bank = !!filters.bank_sheet;
 	var cadre = !!filters.show_cadre;
-%}
+		var sig = (filters.pay_mode || "All") !== "Bank";%}
 
 <div class="le">
 	<table class="hdr">
-		<tr><td colspan="3" class="band">{%= esc(company) %}</td></tr>
 		<tr>
-			<td colspan="2" class="ttl">Employee Leave Encashment Report{%= summary ? " (Summary by " + esc(filters.summary) + ")" : "" %}</td>
-			<td class="rec">Record No<b>CN/QR/HRM/S-025</b></td>
+			<td class="logo-cell" rowspan="2"><img class="logo" src="{%= logo %}" alt="ATS"></td>
+			<td colspan="2" class="band">{%= esc(company) %}</td>
 		</tr>
 		<tr>
-			<td class="ly">Leave Year</td>
-			<td colspan="2" class="lyv">{%= leave_year %}</td>
+			<td class="ttl" colspan="2"><span>Employee Leave Encashment Report{%= summary ? " (Summary by " + esc(filters.summary) + ")" : "" %}</span></td>
+		</tr>
+	</table>
+
+	<table class="meta">
+		<tr>
+			<td class="m1">{%= now_long %}</td>
+			<td class="m2">Printed By &nbsp;|&nbsp; {%= esc(printed_by) %}</td>
+			<td class="m3">Leave Year &nbsp;|&nbsp; <b>{%= leave_year %}</b></td>
 		</tr>
 	</table>
 
 	<table class="info">
 		<tr>
-			<td>{%= now %}</td>
-			<td>Printed By: <b>{%= esc(printed_by) %}</b></td>
 			<td>Period: <b>{%= d(filters.from_date) %}</b> to <b>{%= d(filters.to_date) %}</b></td>
-			<td style="text-align:right;">Pay Mode: <b>{%= esc(filters.pay_mode || "All") %}</b></td>
+			<td style="text-align:center;">Pay Mode: <b>{%= esc(filters.pay_mode || "All") %}</b></td>
+			<td style="text-align:right;">Status: <b>{%= esc(filters.status || "All") %}</b></td>
 		</tr>
 	</table>
 
@@ -71,8 +92,7 @@
 				<th class="num">G.Salary</th><th class="num">L.Days</th><th class="num">Rate</th>
 				<th class="num">Amount</th><th class="num">Advance</th><th class="num">Inc.Tax</th><th class="num">Paid Leave</th>
 				{% if (cadre) { %}<th>Cadre</th>{% } %}
-				{% if (bank) { %}<th>Bank / Account</th>{% } %}
-				<th>Signature</th>
+				{% if (sig) { %}<th>Signature</th>{% } %}
 			</tr>
 		</thead>
 		<tbody>
@@ -82,7 +102,7 @@
 			{% for (var i = 0; i < rows.length; i++) { var r = rows[i]; %}
 			<tr>
 				<td>{%= r.sr_no %}</td>
-				<td><b>{%= esc(r.employee_name) %}</b>{% if (r.cnic) { %}<span class="sub">{%= esc(r.cnic) %}</span>{% } %}</td>
+				<td><b>{%= esc(r.employee_name) %}</b>{% if (r.bank_ac_no) { %}<span class="sub">{%= esc(r.bank_ac_no) %}</span>{% } %}</td>
 				<td>{%= esc(r.code) %}</td>
 				<td>{%= esc(r.designation) %}</td>
 				<td class="nw">{%= d(r.doa) %}</td>
@@ -94,8 +114,7 @@
 				<td class="num">{%= n0(r.income_tax) %}</td>
 				<td class="num"><b>{%= n0(r.paid_leave) %}</b></td>
 				{% if (cadre) { %}<td>{%= esc(r.cadre) %}</td>{% } %}
-				{% if (bank) { %}<td>{%= esc(r.bank_name) %}<span class="sub">{%= esc(r.bank_ac_no) %}</span></td>{% } %}
-				<td><div class="sig"></div></td>
+				{% if (sig) { %}<td>{% if (r.pay_mode !== "Bank") { %}<div class="sig"></div>{% } %}</td>{% } %}
 			</tr>
 			{% } %}
 			{% if (rows.length) { %}
@@ -108,8 +127,7 @@
 				<td class="num">{%= n0(total.income_tax) %}</td>
 				<td class="num">{%= n0(total.paid_leave) %}</td>
 				{% if (cadre) { %}<td></td>{% } %}
-				{% if (bank) { %}<td></td>{% } %}
-				<td></td>
+				{% if (sig) { %}<td></td>{% } %}
 			</tr>
 			{% } %}
 		</tbody>
@@ -151,10 +169,10 @@
 
 	<table class="signs">
 		<tr>
-			<td><span>Prepared By</span></td>
-			<td><span>HR Manager</span></td>
+			<td><span>Payroll</span></td>
 			<td><span>Accounts</span></td>
-			<td><span>Approved By</span></td>
+			<td><span>Audit</span></td>
+			<td><span>General Manager</span></td>
 		</tr>
 	</table>
 </div>

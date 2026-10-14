@@ -21,6 +21,13 @@ frappe.query_reports["Employee Leave Encashment Report"] = {
 			})(),
 		},
 		{
+			fieldname: "status",
+			label: __("Status"),
+			fieldtype: "Select",
+			options: ["All", "Draft", "Submitted", "Cancelled"].join("\n"),
+			default: "All",
+		},
+		{
 			fieldname: "pay_mode",
 			label: __("Pay Mode"),
 			fieldtype: "Select",
@@ -67,6 +74,10 @@ frappe.query_reports["Employee Leave Encashment Report"] = {
 
 	formatter: function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
+		if (data && column.fieldname === "status" && data.status) {
+			const color = data.status.includes("Draft") ? "red" : (data.status.includes("Cancelled") ? "gray" : "green");
+			value = `<span class="indicator-pill ${color}">${value}</span>`;
+		}
 		if (data && data.is_total) {
 			value = `<b>${value}</b>`;
 		}

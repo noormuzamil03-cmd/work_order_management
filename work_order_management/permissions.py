@@ -1,7 +1,12 @@
+import json
+
 import frappe
 
-# Roles that can see every Work Order Slip and Completion
+# Only these see every Work Order Slip / Completion (Administrator always does)
 FULL_ACCESS_ROLES = {"System Manager", "Work Order Approver"}
+
+SLIP = "Work Order Slip"
+COMPLETION = "Work Order Completion"
 
 
 def has_full_access(user):
@@ -10,57 +15,22 @@ def has_full_access(user):
     return bool(FULL_ACCESS_ROLES & set(frappe.get_roles(user)))
 
 
-def get_user_departments(user):
-    """User's department(s) from Employee, including all child departments."""
-    cache = frappe.flags.setdefault("wom_dept_cache", {})
-    if user in cache:
-        return cache[user]
-
-    result = set()
-    for dept in frappe.get_all("Employee", filters={"user_id": user, "status": "Active"}, pluck="department"):
-        if not dept:
-            continue
-        node = frappe.db.get_value("Department", dept, ["lft", "rgt"], as_dict=True)
-        if not node:
-            result.add(dept)
-            continue
-        result.update(frappe.get_all(
-            "Department",
-            filters={"lft": [">=", node.lft], "rgt": ["<=", node.rgt]},
-            pluck="name",
-        ))
-    cache[user] = sorted(result)
-    return cache[user]
-
-
-def _sql_in(values):
-    return ", ".join(frappe.db.escape(v) for v in values)
-
-
-def _condition(user, alias, user_fields):
-    """SQL condition: rows the user is involved in."""
+def _mine_sql(alias, user):
+    """Created by the user, or assigned to the user (Assigned To)."""
     u = frappe.db.escape(user)
-    parts = [f"{alias}.`{field}` = {u}" for field in user_fields]
-    depts = get_user_departments(user)
-    if depts:
-        d = _sql_in(depts)
-        parts.append(f"{alias}.`requesting_department` in ({d})")
-        parts.append(f"{alias}.`assigned_department` in ({d})")
-    return "(" + " or ".join(parts) + ")"
-
-
-SLIP_USER_FIELDS = ("owner", "requested_by")
-COMPLETION_USER_FIELDS = ("owner", "completed_by", "received_by")
+    like = frappe.db.escape(f'%"{user}"%')
+    return f"({alias}.`owner` = {u} or {alias}.`_assign` like {like})"
 
 
 def slip_condition_for(user, alias="`tabWork Order Slip`"):
-    """Empty string means no restriction."""
+    """Empty string means no restriction (also used by the Daily Work Orders Report)."""
     if has_full_access(user):
         return ""
-    return _condition(user, alias, SLIP_USER_FIELDS)
+    return _mine_sql(alias, user)
 
 
 # ---------------- Hooks: lists, reports, search ----------------
+# Documents shared with a user (Share button) are added by Frappe automatically.
 
 def slip_query(user=None):
     return slip_condition_for(user or frappe.session.user)
@@ -70,27 +40,45 @@ def completion_query(user=None):
     user = user or frappe.session.user
     if has_full_access(user):
         return ""
-    return _condition(user, "`tabWork Order Completion`", COMPLETION_USER_FIELDS)
+    alias = "`tabWork Order Completion`"
+    # Own / assigned completions, plus completions of slips the user created or was assigned
+    return (
+        f"({_mine_sql(alias, user)} or {alias}.`work_order_slip` in "
+        f"(select s.name from `tabWork Order Slip` s where {_mine_sql('s', user)}))"
+    )
 
 
 # ---------------- Hooks: opening a single document ----------------
 
-def _involved(doc, user, user_fields):
-    if any(doc.get(field) == user for field in user_fields):
-        return True
-    depts = set(get_user_departments(user))
-    return doc.get("requesting_department") in depts or doc.get("assigned_department") in depts
+def _assigned_users(doc):
+    try:
+        return json.loads(doc.get("_assign") or "[]")
+    except Exception:
+        return []
+
+
+def _is_shared(doctype, name, user):
+    return bool(frappe.db.exists("DocShare", {"share_doctype": doctype, "share_name": name, "user": user}))
+
+
+def _is_mine(doc, user):
+    return doc.get("owner") == user or user in _assigned_users(doc) or _is_shared(doc.doctype, doc.name, user)
 
 
 def slip_has_permission(doc, ptype=None, user=None):
     user = user or frappe.session.user
     if has_full_access(user) or doc.is_new():
         return None  # normal role permissions apply
-    return None if _involved(doc, user, SLIP_USER_FIELDS) else False
+    return None if _is_mine(doc, user) else False
 
 
 def completion_has_permission(doc, ptype=None, user=None):
     user = user or frappe.session.user
-    if has_full_access(user) or doc.is_new():
+    if has_full_access(user) or doc.is_new() or _is_mine(doc, user):
         return None
-    return None if _involved(doc, user, COMPLETION_USER_FIELDS) else False
+    slip_name = doc.get("work_order_slip")
+    if slip_name and frappe.db.exists(SLIP, slip_name):
+        slip = frappe.get_doc(SLIP, slip_name)
+        if _is_mine(slip, user):
+            return None
+    return False

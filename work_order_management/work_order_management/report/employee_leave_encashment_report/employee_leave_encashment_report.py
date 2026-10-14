@@ -9,6 +9,8 @@ DAYS_FIELDS = ("encashment_days", "encashable_days", "actual_encashable_days")
 # Set to False if outstanding Employee Advances should not be deducted
 DEDUCT_ADVANCE = True
 SUMMARY_FIELD = {"Department": "department", "Designation": "designation", "Pay Mode": "pay_mode"}
+STATUS_DOCSTATUS = {"Draft": 0, "Submitted": 1, "Cancelled": 2}
+DOCSTATUS_LABEL = {0: "Draft", 1: "Submitted", 2: "Cancelled"}
 
 
 def execute(filters=None):
@@ -28,7 +30,7 @@ def get_columns(filters):
     cols = [
         {"label": _("Sr.No"), "fieldname": "sr_no", "fieldtype": "Int", "width": 60},
         {"label": _("Name"), "fieldname": "employee_name", "fieldtype": "Data", "width": 200},
-        {"label": _("CNIC"), "fieldname": "cnic", "fieldtype": "Data", "width": 130},
+        {"label": _("Account No"), "fieldname": "bank_ac_no", "fieldtype": "Data", "width": 150},
         {"label": _("Code"), "fieldname": "code", "fieldtype": "Data", "width": 80},
         {"label": _("Designation"), "fieldname": "designation", "fieldtype": "Data", "width": 180},
         {"label": _("DOA"), "fieldname": "doa", "fieldtype": "Date", "width": 100},
@@ -46,7 +48,6 @@ def get_columns(filters):
         cols += [
             {"label": _("Pay Mode"), "fieldname": "pay_mode", "fieldtype": "Data", "width": 90},
             {"label": _("Bank"), "fieldname": "bank_name", "fieldtype": "Data", "width": 140},
-            {"label": _("Account No"), "fieldname": "bank_ac_no", "fieldtype": "Data", "width": 160},
         ]
     cols.append({"label": _("Signature"), "fieldname": "signature", "fieldtype": "Data", "width": 110})
     return cols
@@ -70,7 +71,12 @@ def get_rows(filters):
     meta = frappe.get_meta("Leave Encashment")
     days_field = next((f for f in DAYS_FIELDS if meta.has_field(f)), None)
 
-    enc_filters = {"docstatus": 1}
+    # Status: All = Draft + Submitted (Cancelled only when asked for)
+    if filters.status in STATUS_DOCSTATUS:
+        enc_filters = {"docstatus": STATUS_DOCSTATUS[filters.status]}
+    else:
+        enc_filters = {"docstatus": ["<", 2]}
+
     if filters.from_date and filters.to_date:
         enc_filters["encashment_date"] = ["between", [filters.from_date, filters.to_date]]
     elif filters.from_date:
@@ -78,7 +84,7 @@ def get_rows(filters):
     elif filters.to_date:
         enc_filters["encashment_date"] = ["<=", filters.to_date]
 
-    fields = ["employee", "encashment_amount"]
+    fields = ["employee", "encashment_amount", "docstatus"]
     if days_field:
         fields.append(f"{days_field} as days")
     encashments = frappe.get_all("Leave Encashment", filters=enc_filters, fields=fields)
@@ -94,9 +100,10 @@ def get_rows(filters):
     for e in encashments:
         if e.employee not in employees:
             continue
-        acc = per_emp.setdefault(e.employee, frappe._dict(days=0.0, amount=0.0))
+        acc = per_emp.setdefault(e.employee, frappe._dict(days=0.0, amount=0.0, statuses=set()))
         acc.days += flt(e.get("days"))
         acc.amount += flt(e.encashment_amount)
+        acc.statuses.add(DOCSTATUS_LABEL.get(e.docstatus, ""))
 
     ordered = sorted(per_emp, key=lambda emp_id: str(employees[emp_id].get("employee_number") or emp_id))
     rows = []
@@ -105,7 +112,7 @@ def get_rows(filters):
         enc = per_emp[emp_id]
         rate = enc.amount / enc.days if enc.days else 0
         advance = min(flt(advances.get(emp_id)), enc.amount)
-        income_tax = 0.0
+        income_tax = round(flt(emp.get("custom_income_tax_amount")))
         rows.append(frappe._dict(
             sr_no=i,
             employee=emp_id,
@@ -121,6 +128,7 @@ def get_rows(filters):
             advance=round(advance),
             income_tax=income_tax,
             paid_leave=round(enc.amount - advance - income_tax),
+            status=" + ".join(sorted(s for s in enc.statuses if s)),
             pay_mode=emp.get("salary_mode"),
             bank_name=emp.get("bank_name"),
             bank_ac_no=emp.get("bank_ac_no"),
@@ -134,7 +142,7 @@ def get_rows(filters):
 def get_employees(ids, filters):
     meta = frappe.get_meta("Employee")
     wanted = ["employee_name", "employee_number", "designation", "date_of_joining", "department",
-              "salary_mode", "bank_name", "bank_ac_no", "grade"]
+              "salary_mode", "bank_name", "bank_ac_no", "grade", "custom_income_tax_amount"]
     fields = ["name"] + [f for f in wanted if meta.has_field(f)]
     cnic_field = next((f for f in CNIC_FIELDS if meta.has_field(f)), None)
     if cnic_field:
