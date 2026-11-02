@@ -123,8 +123,8 @@ const WP_EN_NOTE = {
 const WP_REQ = [
 	["reference_no", "department", "valid_from", "valid_until", "valid_day", "permit_issued_to", "receiver_department", "possible_hazards"],
 	["check_1", "check_2", "check_3", "check_4", "check_5", "check_6", "check_7"],
-	["site_supervisor", "sign_production_incharge", "sign_permit_issuer", "sign_maintenance_incharge", "sign_permit_receiver", "sign_hse_incharge"],
-	["work_status", "sign_receiver_closeout", "receiver_date", "receiver_time", "sign_issuer_closeout", "issuer_date", "issuer_time"],
+	["site_supervisor"],
+	["work_status", "receiver_date", "receiver_time", "issuer_date", "issuer_time"],
 ];
 // phonetic Urdu keyboard (a=ا b=ب ... like the common Urdu phonetic layout)
 const WP_KEYS = {

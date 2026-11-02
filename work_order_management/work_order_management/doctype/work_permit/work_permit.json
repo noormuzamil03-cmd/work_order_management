@@ -402,8 +402,7 @@
   {
    "fieldname": "sign_production_incharge",
    "fieldtype": "Signature",
-   "label": "Signature \u00b7 Production In-charge",
-   "reqd": 1
+   "label": "Signature \u00b7 Production In-charge"
   },
   {
    "fieldname": "column_break_s1",
@@ -412,8 +411,7 @@
   {
    "fieldname": "sign_permit_issuer",
    "fieldtype": "Signature",
-   "label": "Signature \u00b7 Permit Issuer",
-   "reqd": 1
+   "label": "Signature \u00b7 Permit Issuer"
   },
   {
    "fieldname": "declaration_section",
@@ -431,8 +429,7 @@
   {
    "fieldname": "sign_maintenance_incharge",
    "fieldtype": "Signature",
-   "label": "Signature \u00b7 Maintenance In-charge",
-   "reqd": 1
+   "label": "Signature \u00b7 Maintenance In-charge"
   },
   {
    "fieldname": "column_break_s2",
@@ -441,8 +438,7 @@
   {
    "fieldname": "sign_permit_receiver",
    "fieldtype": "Signature",
-   "label": "Signature \u00b7 Permit Receiver",
-   "reqd": 1
+   "label": "Signature \u00b7 Permit Receiver"
   },
   {
    "fieldname": "hse_section",
@@ -461,8 +457,7 @@
   {
    "fieldname": "sign_hse_incharge",
    "fieldtype": "Signature",
-   "label": "Signature \u00b7 HSE In-charge",
-   "reqd": 1
+   "label": "Signature \u00b7 HSE In-charge"
   },
   {
    "fieldname": "closeout_tab",
@@ -490,8 +485,7 @@
   {
    "fieldname": "sign_receiver_closeout",
    "fieldtype": "Signature",
-   "label": "Signature \u00b7 Permit Receiver",
-   "mandatory_depends_on": "eval:doc.work_status"
+   "label": "Signature \u00b7 Permit Receiver"
   },
   {
    "fieldname": "column_break_r1",
@@ -529,8 +523,7 @@
   {
    "fieldname": "sign_issuer_closeout",
    "fieldtype": "Signature",
-   "label": "Signature \u00b7 Permit Issuer",
-   "mandatory_depends_on": "eval:doc.work_status"
+   "label": "Signature \u00b7 Permit Issuer"
   },
   {
    "fieldname": "column_break_i1",
@@ -591,7 +584,7 @@
   }
  ],
  "links": [],
- "modified": "2026-10-27 15:00:00.000000",
+ "modified": "2026-11-02 15:59:58.000000",
  "modified_by": "Administrator",
  "module": "Work Order Management",
  "name": "Work Permit",
