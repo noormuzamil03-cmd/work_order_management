@@ -1,0 +1,620 @@
+{
+ "actions": [],
+ "autoname": "format:WP-{#####}",
+ "creation": "2026-10-27 15:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "details_tab",
+  "header_section",
+  "permit_no",
+  "permit_color",
+  "column_break_h",
+  "details_section",
+  "reference_no",
+  "column_break_1",
+  "department",
+  "validity_section",
+  "valid_from",
+  "column_break_v1",
+  "valid_until",
+  "column_break_v2",
+  "valid_day",
+  "validity_section_2",
+  "valid_until_work_complete",
+  "issued_section",
+  "permit_issued_to",
+  "permit_issued_to_name",
+  "column_break_2",
+  "receiver_department",
+  "hazards_section",
+  "possible_hazards",
+  "checks_tab",
+  "checks_section",
+  "check_1",
+  "check_2",
+  "check_3",
+  "check_4",
+  "check_5",
+  "check_6",
+  "check_6_extra",
+  "check_6_details",
+  "column_break_c6",
+  "check_6_safety",
+  "checks_section_2",
+  "check_7",
+  "tags_section",
+  "tag_it",
+  "column_break_t1",
+  "tag_ft",
+  "column_break_t2",
+  "tag_lt",
+  "signoffs_tab",
+  "signoff_section",
+  "site_supervisor",
+  "column_break_sup1",
+  "site_supervisor_name",
+  "column_break_sup2",
+  "site_supervisor_designation",
+  "signoff_section_1",
+  "additional_safety",
+  "signoff_section_2",
+  "sign_production_incharge",
+  "column_break_s1",
+  "sign_permit_issuer",
+  "declaration_section",
+  "declaration_1",
+  "declaration_section_2",
+  "sign_maintenance_incharge",
+  "column_break_s2",
+  "sign_permit_receiver",
+  "hse_section",
+  "hse_remarks",
+  "hse_statement",
+  "sign_hse_incharge",
+  "closeout_tab",
+  "closeout_section",
+  "work_status",
+  "closeout_receiver_section",
+  "sign_receiver_closeout",
+  "column_break_r1",
+  "receiver_date",
+  "column_break_r2",
+  "receiver_time",
+  "completion_section",
+  "declaration_2",
+  "closeout_issuer_section",
+  "sign_issuer_closeout",
+  "column_break_i1",
+  "issuer_date",
+  "column_break_i2",
+  "issuer_time",
+  "copies_section",
+  "copy_issuer",
+  "column_break_k1",
+  "copy_receiver",
+  "column_break_k2",
+  "copy_hse",
+  "column_break_k3",
+  "copy_record"
+ ],
+ "fields": [
+  {
+   "fieldname": "details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Details"
+  },
+  {
+   "fieldname": "header_section",
+   "fieldtype": "Section Break",
+   "label": "Work Permit (Written Authorization)",
+   "description": "ATS Synthetic (Private) Limited"
+  },
+  {
+   "fieldname": "permit_no",
+   "fieldtype": "Data",
+   "label": "Permit No.",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "permit_color",
+   "fieldtype": "Select",
+   "label": "Permit Colour",
+   "options": "\nRed\nGreen\nYellow\nBlue",
+   "hidden": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_h",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "details_section",
+   "fieldtype": "Section Break",
+   "label": "1. Permit details",
+   "description": "Who the permit is for, and how long it stays valid."
+  },
+  {
+   "fieldname": "reference_no",
+   "fieldtype": "Data",
+   "label": "Reference No.",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "validity_section",
+   "fieldtype": "Section Break",
+   "label": "This work permit is valid"
+  },
+  {
+   "fieldname": "valid_from",
+   "fieldtype": "Time",
+   "label": "From (time)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_v1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "valid_until",
+   "fieldtype": "Time",
+   "label": "Until (time)",
+   "mandatory_depends_on": "eval:!doc.valid_until_work_complete",
+   "read_only_depends_on": "eval:doc.valid_until_work_complete"
+  },
+  {
+   "fieldname": "column_break_v2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "valid_day",
+   "fieldtype": "Select",
+   "label": "Day",
+   "options": "\nMonday\nTuesday\nWednesday\nThursday\nFriday\nSaturday\nSunday",
+   "reqd": 1
+  },
+  {
+   "fieldname": "validity_section_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "valid_until_work_complete",
+   "fieldtype": "Check",
+   "label": "Valid until the work is complete"
+  },
+  {
+   "fieldname": "issued_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "permit_issued_to",
+   "fieldtype": "Link",
+   "label": "Permit issued to",
+   "options": "Employee",
+   "reqd": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "permit_issued_to_name",
+   "fieldtype": "Data",
+   "label": "Name",
+   "fetch_from": "permit_issued_to.employee_name",
+   "read_only": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "receiver_department",
+   "fieldtype": "Link",
+   "label": "Receiver's department",
+   "options": "Department",
+   "reqd": 1
+  },
+  {
+   "fieldname": "hazards_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "possible_hazards",
+   "fieldtype": "Small Text",
+   "label": "Possible hazards and their details",
+   "reqd": 1
+  },
+  {
+   "fieldname": "checks_tab",
+   "fieldtype": "Tab Break",
+   "label": "Safety checks"
+  },
+  {
+   "fieldname": "checks_section",
+   "fieldtype": "Section Break",
+   "label": "2. Safety checks",
+   "description": "Work-site checks, as per Safety First. Choose Yes or No for each check, or N/A if it isn't needed."
+  },
+  {
+   "fieldname": "check_1",
+   "fieldtype": "Select",
+   "label": "1. Power supply switched off and electrical equipment etc. moved away.",
+   "options": "\nYes\nNo\nN/A",
+   "reqd": 1
+  },
+  {
+   "fieldname": "check_2",
+   "fieldtype": "Select",
+   "label": "2. Safety locks / tags etc. applied.",
+   "options": "\nYes\nNo\nN/A",
+   "reqd": 1
+  },
+  {
+   "fieldname": "check_3",
+   "fieldtype": "Select",
+   "label": "3. All necessary valves closed, locked and tagged.",
+   "options": "\nYes\nNo\nN/A",
+   "reqd": 1
+  },
+  {
+   "fieldname": "check_4",
+   "fieldtype": "Select",
+   "label": "4. The relevant area has been cleaned and flammable materials removed from it.",
+   "options": "\nYes\nNo\nN/A",
+   "reqd": 1
+  },
+  {
+   "fieldname": "check_5",
+   "fieldtype": "Select",
+   "label": "5. Notice / warning placed at the relevant area.",
+   "options": "\nYes\nNo\nN/A",
+   "reqd": 1
+  },
+  {
+   "fieldname": "check_6",
+   "fieldtype": "Select",
+   "label": "6. Is there any other fire hazard besides these? If Yes, explain and list the necessary safety arrangements.",
+   "options": "\nYes\nNo\nN/A",
+   "reqd": 1
+  },
+  {
+   "fieldname": "check_6_extra",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "check_6_details",
+   "fieldtype": "Small Text",
+   "label": "Details"
+  },
+  {
+   "fieldname": "column_break_c6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "check_6_safety",
+   "fieldtype": "Small Text",
+   "label": "Necessary safety arrangement"
+  },
+  {
+   "fieldname": "checks_section_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "check_7",
+   "fieldtype": "Select",
+   "label": "7. Fire fighter duty assigned and HSE department informed.",
+   "options": "\nYes\nNo\nN/A",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tags_section",
+   "fieldtype": "Section Break",
+   "label": "Tag times (optional)"
+  },
+  {
+   "fieldname": "tag_it",
+   "fieldtype": "Time",
+   "label": "IT"
+  },
+  {
+   "fieldname": "column_break_t1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tag_ft",
+   "fieldtype": "Time",
+   "label": "FT"
+  },
+  {
+   "fieldname": "column_break_t2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tag_lt",
+   "fieldtype": "Time",
+   "label": "LT"
+  },
+  {
+   "fieldname": "signoffs_tab",
+   "fieldtype": "Tab Break",
+   "label": "Sign-offs"
+  },
+  {
+   "fieldname": "signoff_section",
+   "fieldtype": "Section Break",
+   "label": "3. Sign-offs and authorization",
+   "description": "Site supervisor, extra precautions and the signatures that release the work."
+  },
+  {
+   "fieldname": "site_supervisor",
+   "fieldtype": "Link",
+   "label": "Supervisor appointed by the concerned department at the work site",
+   "options": "Employee",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_sup1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "site_supervisor_name",
+   "fieldtype": "Data",
+   "label": "Supervisor name",
+   "fetch_from": "site_supervisor.employee_name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_sup2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "site_supervisor_designation",
+   "fieldtype": "Data",
+   "label": "Designation",
+   "fetch_from": "site_supervisor.designation",
+   "read_only": 1
+  },
+  {
+   "fieldname": "signoff_section_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "additional_safety",
+   "fieldtype": "Small Text",
+   "label": "Additional necessary safety arrangements"
+  },
+  {
+   "fieldname": "signoff_section_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sign_production_incharge",
+   "fieldtype": "Signature",
+   "label": "Signature \u00b7 Production In-charge",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_s1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sign_permit_issuer",
+   "fieldtype": "Signature",
+   "label": "Signature \u00b7 Permit Issuer",
+   "reqd": 1
+  },
+  {
+   "fieldname": "declaration_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "declaration_1",
+   "fieldtype": "HTML",
+   "options": "<div style=\"background:var(--yellow-50,#FFF4D0);border:1.5px dashed #DDA800;border-radius:12px;padding:12px 14px\"><span style=\"font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:#FFC21A;color:#2B2100;padding:2px 9px;border-radius:999px\">Declaration</span><p style=\"margin:10px 0 0;color:#2B2100\">I declare that I have checked the work area thoroughly and the work can now be carried out here without hazard. I am responsible for cleaning the affected area once the work is complete, and for informing the concerned department and getting its clearance.</p></div>"
+  },
+  {
+   "fieldname": "declaration_section_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sign_maintenance_incharge",
+   "fieldtype": "Signature",
+   "label": "Signature \u00b7 Maintenance In-charge",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_s2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sign_permit_receiver",
+   "fieldtype": "Signature",
+   "label": "Signature \u00b7 Permit Receiver",
+   "reqd": 1
+  },
+  {
+   "fieldname": "hse_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "hse_remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks on safety arrangements"
+  },
+  {
+   "fieldname": "hse_statement",
+   "fieldtype": "HTML",
+   "options": "<p style=\"margin:0;padding:10px 14px;border-radius:12px;background:var(--blue-50,#E2EBFB);font-weight:500\">&#10003; I have inspected the work site with regard to safety arrangements.</p>"
+  },
+  {
+   "fieldname": "sign_hse_incharge",
+   "fieldtype": "Signature",
+   "label": "Signature \u00b7 HSE In-charge",
+   "reqd": 1
+  },
+  {
+   "fieldname": "closeout_tab",
+   "fieldtype": "Tab Break",
+   "label": "Close-out"
+  },
+  {
+   "fieldname": "closeout_section",
+   "fieldtype": "Section Break",
+   "label": "4. Close-out",
+   "description": "Filled in when the work ends. The area is checked and the permit is cancelled."
+  },
+  {
+   "fieldname": "work_status",
+   "fieldtype": "Select",
+   "label": "Work status",
+   "options": "\nWork complete\nWork incomplete",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "closeout_receiver_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sign_receiver_closeout",
+   "fieldtype": "Signature",
+   "label": "Signature \u00b7 Permit Receiver",
+   "mandatory_depends_on": "eval:doc.work_status"
+  },
+  {
+   "fieldname": "column_break_r1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "receiver_date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "mandatory_depends_on": "eval:doc.work_status"
+  },
+  {
+   "fieldname": "column_break_r2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "receiver_time",
+   "fieldtype": "Time",
+   "label": "Time",
+   "mandatory_depends_on": "eval:doc.work_status"
+  },
+  {
+   "fieldname": "completion_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "declaration_2",
+   "fieldtype": "HTML",
+   "options": "<div style=\"background:var(--yellow-50,#FFF4D0);border:1.5px dashed #DDA800;border-radius:12px;padding:12px 14px\"><span style=\"font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:#FFC21A;color:#2B2100;padding:2px 9px;border-radius:999px\">Upon work completion</span><p style=\"margin:10px 0 0;color:#2B2100\">I declare that, on completion or non-completion of the work, I have checked the work area thoroughly. The affected area is completely clean and production can safely restart here. This permit is cancelled.</p></div>"
+  },
+  {
+   "fieldname": "closeout_issuer_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sign_issuer_closeout",
+   "fieldtype": "Signature",
+   "label": "Signature \u00b7 Permit Issuer",
+   "mandatory_depends_on": "eval:doc.work_status"
+  },
+  {
+   "fieldname": "column_break_i1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "issuer_date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "mandatory_depends_on": "eval:doc.work_status"
+  },
+  {
+   "fieldname": "column_break_i2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "issuer_time",
+   "fieldtype": "Time",
+   "label": "Time",
+   "mandatory_depends_on": "eval:doc.work_status"
+  },
+  {
+   "fieldname": "copies_section",
+   "fieldtype": "Section Break",
+   "label": "Signed copy of this work permit for"
+  },
+  {
+   "fieldname": "copy_issuer",
+   "fieldtype": "Check",
+   "label": "Issuer"
+  },
+  {
+   "fieldname": "column_break_k1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "copy_receiver",
+   "fieldtype": "Check",
+   "label": "Receiver"
+  },
+  {
+   "fieldname": "column_break_k2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "copy_hse",
+   "fieldtype": "Check",
+   "label": "HSE Department"
+  },
+  {
+   "fieldname": "column_break_k3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "copy_record",
+   "fieldtype": "Check",
+   "label": "Record"
+  }
+ ],
+ "links": [],
+ "modified": "2026-10-27 15:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Work Order Management",
+ "name": "Work Permit",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "print": 1,
+   "email": 1,
+   "report": 1,
+   "export": 1,
+   "share": 1
+  }
+ ],
+ "search_fields": "permit_no,permit_issued_to_name,department",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "permit_issued_to_name",
+ "track_changes": 1
+}
